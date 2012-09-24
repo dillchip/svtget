@@ -44,6 +44,7 @@ svtplay_url="http://www.svtplay.se"
 # actions
 play=0
 subtitles=0
+maxquality=0
 
 DEPENDENCIES="rtmpdump curl $SED cut bash"
 PLAYERS="mplayer vlc"
@@ -110,6 +111,10 @@ function pick_tcUrl {
 	if [ "$#" -eq 1 ]; then
 		stream=1
 	fi
+	if [ "$maxquality" -eq 1 ]; then
+		let n--
+		stream=$n
+	fi
 	while [ -z ${Streams[$stream]} ]; do
 		echo -ne "\nWhich file do you want? [#] "
 		read stream
@@ -140,6 +145,7 @@ function askOverwrite {
 function print_help {
 	echo -e "Usage: $0 -q [l|m|n|h|320|850|1400|2400] -m -s $svtplay_url/..."
 	echo -e " -q\tquality of the stream"
+	echo -e " -m\tget the highest quality stream"
 	echo -e " -p\tplay output"
 	echo -e " -s\tfetch subtitles"
 	echo -e " -d\Debug, echos the cmd line"
@@ -147,10 +153,13 @@ function print_help {
 
 DEBUG=""
 
-while getopts "q:psdh" opt; do
+while getopts "q:psdhm" opt; do
 	case $opt in
 	q)
 		set_bitrate $OPTARG
+		;;
+	m)
+		maxquality=1
 		;;
 	p)
 		play=1
